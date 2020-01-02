@@ -1,0 +1,4 @@
+*          eol=lf
+*.md       text
+*.yaml     text
+*.yml      text

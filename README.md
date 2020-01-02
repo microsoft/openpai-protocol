@@ -1,5 +1,19 @@
+OpenPAI Protocol
+================
 
-# Contributing
+[OpenPAI](https://github.com/microsoft/pai) Protocol is a specification that includes:
+- The resource requirement, including the docker image used by the job container, and the data used by the job, etc.
+- Various requirement like the GPU/CPU usage, container role and job completion policy used by [Framework Controller](https://github.com/microsoft/frameworkcontroller).
+- Scheduling requirement used by [Framework Controller](https://github.com/microsoft/frameworkcontroller) and [HiveD Scheduler](https://github.com/microsoft/hivedscheduler).
+- Runtime environment variables, if needed.
+
+OpenPAI protocol enables job sharing and portability: a job specified by the protocol can run in different OpenPAI deployment.
+The protocol also allows users to make a template of a job, which further facilitates the sharing and collaboration in a team that has similar but slightly different configuration for a class of jobs.
+With the protocol, OpenPAI introduces marketplace that hosts job or job templates that share with other people.
+
+
+Contributing
+------------
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us

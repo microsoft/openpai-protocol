@@ -1,0 +1,97 @@
+%YAML 1.2
+---
+# OpenPAI Job Protocol YAML
+
+protocolVersion: String, required # Protocol version, current version is 2.
+name: String, required # String in ^([a-zA-Z0-9][a-zA-Z0-9_-]*)?[a-zA-Z0-9]$ format, no longer than 63 characters.
+type: String, required # Component type, should be "job" here.
+version: String, optional # Component version, default is latest.
+contributor: String, optional
+description: String, optional
+
+prerequisites: # Optional
+  # Each item is the protocol for data, script, dockerimage, or output type.
+  - protocolVersion: String, optional # If omitted, follow the protocolVersion in root.
+    name: String, required
+    type: String, required # Component type. Must be one of the following: data, script, dockerimage, or output. Prerequisites.type cannot be "job".
+    version: String, optional # Component version, Default is latest.
+    contributor: String, optional
+    description: String, optional
+    auth: Object, optional # Only available when the type is dockerimage.
+      username: String, optional
+      password: String, optional # If a password is needed, it should be referenced as a secret
+      registryuri: String, optional
+    uri: String or list, required # Only when the type is data can the uri be a list.
+
+# If specified, the whole parameters object can be referenced as `$parameters`.
+# Scope of reference `$parameters`: the reference is shared among all task roles.
+parameters: # Optional, can be omitted.
+  <param1>: value1 # Specify name and value of all the referencable parameters that will be used in the whole job template.
+  <param2>: value2 # Can be referenced by `<% $parameters.param1 %>`, `<% $parameters.param2 %>`.
+
+# If sensitive information including password or API key is needed in the protocol,
+# it should be specified here in secrets section and referenced as `$secrets`.
+# Scope of reference `$secrets`: the reference is shared among all task roles and docker image's `auth` field.
+# A system that supports PAI protocol should keep the secret information away from
+# unauthorized users (how to define unauthorized user is out of the scope of this protocol).
+# For example, the yaml file used for job cloning, the stdout/stderr should protect all information marked as secrets.
+secrets: # Optional, can be omitted.
+  <secret1>: password # Specify name and value of all secrets that will be used in the whole job template.
+  <secret2>: key # Can be referenced by `<% $secrets.secret1 %>`, `<% $secrets.secret2 %>`.
+
+jobRetryCount: Integer, optional # Default is 0.
+# Task roles are different types of task in the protocol.
+# One job may have one or more task roles, each task role has one or more instances, and each instance runs inside one container.
+taskRoles:
+  <name>: String, required  # Name of the taskRole, string in ^[a-zA-Z_][a-zA-Z0-9_]*$ format (valid C variable name).
+    instances: Integer, optional # Default is 1, instances of a taskRole, no less than 1.
+    completion: # Completion poclicy for the job, https://github.com/Microsoft/pai/blob/master/subprojects/frameworklauncher/yarn/doc/USERMANUAL.md#ApplicationCompletionPolicy.
+      # Number of failed tasks to fail the entire job, -1 or no less than 1, if set to -1 means the job will always succeed regardless any task failure.
+      minFailedInstances: Integer, optional # Default is 1.
+      # Number of succeeded tasks to succeed the entire job, -1 or no less than 1, if set to -1 means the job will only succeed until all tasks are completed and minFailedInstances is not triggered.
+      minSucceededInstances: Integer, optional # Default is task instances.
+    taskRetryCount: Integer, optional # Default is 0.
+    dockerImage: String, required # Should reference to a dockerimage defined in prerequisites.
+    # Scope of the reference `$data`, '$output', `$script`: the reference is only valid inside this task role.
+    # User cannot reference them from another task role. Reference for `$parameters` is global and shared among task roles.
+    data: String, optional # Select data defined in prerequisites, target can be referenced as `$data` in this task role.
+    output: String, optional # Select output defined in prerequisites, target can be referenced as `$output` in this task role.
+    script: String, optional # Select script defined in prerequisites, target can be referenced as `$script` in this task role.
+    extraContainerOptions:
+      shmMB: Integer, optional # Config the /dev/shm in a docker container, https://docs.docker.com/compose/compose-file/#shm_size.
+      infiniband: Boolean, optional # Use InfiniBand devices or not in a docker container.
+    resourcePerInstance:
+      cpu: Integer, required # CPU number, unit is CPU vcore
+      memoryMB: Integer, required # Memory number, unit is MB
+      gpu: Integer, required # GPU number, unit is GPU card
+      ports: # Optional, only for host network, port label is string in ^[a-zA-Z_][a-zA-Z0-9_]*$ format (valid C variable name).
+        <portLabel>: Integer, required, minimum number is 1 # Port number for the port label.
+    commands:
+      - String, required
+
+# To handle that a component may interact with different component differently, user is encouraged to place the codes handling such difference in the "deployments" field,
+# e.g., a job may get input data through wget, hdfs -dfs cp, copy, or just directly read from remote storage. This logic can be placed here.
+# In summary, the deployments field is responsible to make sure the job to run properly in a deployment specific runtime environment.
+# One could have many deployments, but only one deployment can be activated at runtime by specifying in "defaults". User can choose the deployment and specify in "defaults" at submission time.
+deployments:
+  - name: String, required
+    taskRoles:
+      <name>: String, required # Should be in taskRoles
+        preCommands:
+          - String, required # Execute before the taskRole's command
+        postCommands:
+          - String, required # Execute after the taskRole's command
+
+
+defaults: # Optional, default cluster specific settings
+  virtualCluster: String, optional
+  deployment: String, optional # Should reference to deployment defined in deployments
+
+extras: # Optional, extra field, object, save any information that plugin may use
+  submitFrom: String, optional
+  hivedscheduler: # Optional
+    jobPriorityClass: String, required
+    taskRoles:
+      <name>: String, required
+        gpuType/reservationId: String, required  # Only one allowed
+        affinityGroupName: String, optional
