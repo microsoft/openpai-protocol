@@ -22,7 +22,7 @@ components:
         name:
           type: string
           description: String in ^[a-zA-Z0-9_-]+$ format, no longer than 255 characters.
-          pattern: '^[a-zA-Z0-9_-]+$'
+          pattern: "^[a-zA-Z0-9_-]+$"
           minLength: 1
           maxLength: 255
           example: tensorflow_distributed_training
@@ -38,7 +38,7 @@ components:
           example: Here is the description.
     DockerImagePrerequisite:
       allOf:
-        - $ref: '#/components/schemas/PrerequisiteInfo'
+        - $ref: "#/components/schemas/PrerequisiteInfo"
         - type: object
           properties:
             type:
@@ -65,7 +65,7 @@ components:
             - uri
     ScriptOrOutputPrerequisite:
       allOf:
-        - $ref: '#/components/schemas/PrerequisiteInfo'
+        - $ref: "#/components/schemas/PrerequisiteInfo"
         - type: object
           properties:
             type:
@@ -82,7 +82,7 @@ components:
             - uri
     DataPrerequisite:
       allOf:
-        - $ref: '#/components/schemas/PrerequisiteInfo'
+        - $ref: "#/components/schemas/PrerequisiteInfo"
         - type: object
           properties:
             type:
@@ -100,7 +100,7 @@ components:
             - uri
     JobProtocol:
       allOf:
-        - $ref: '#/components/schemas/PrerequisiteInfo'
+        - $ref: "#/components/schemas/PrerequisiteInfo"
         - type: object
           description: Job protocol specification.
           properties:
@@ -115,9 +115,9 @@ components:
               description: Each item is the protocol for data, script, dockerimage, or output type.
               items:
                 oneOf:
-                  - $ref: '#/components/schemas/DockerImagePrerequisite'
-                  - $ref: '#/components/schemas/ScriptOrOutputPrerequisite'
-                  - $ref: '#/components/schemas/DataPrerequisite'
+                  - $ref: "#/components/schemas/DockerImagePrerequisite"
+                  - $ref: "#/components/schemas/ScriptOrOutputPrerequisite"
+                  - $ref: "#/components/schemas/DataPrerequisite"
               minItems: 1
               example:
                 - protocolVersion: 2
