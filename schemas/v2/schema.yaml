@@ -10,7 +10,7 @@ externalDocs:
 paths: {}
 components:
   schemas:
-    OpenPAIComponent:
+    PrerequisiteInfo:
       type: object
       properties:
         protocolVersion:
@@ -35,10 +35,10 @@ components:
           example: OpenPAI
         description:
           type: string
-          example: Here is the job description.
-    DockerImageComponent:
+          example: Here is the description.
+    DockerImagePrerequisite:
       allOf:
-        - $ref: '#/components/schemas/OpenPAIComponent'
+        - $ref: '#/components/schemas/PrerequisiteInfo'
         - type: object
           properties:
             type:
@@ -63,21 +63,9 @@ components:
             - name
             - type
             - uri
-          example:
-            protocolVersion: 2
-            name: tf_example
-            type: dockerimage
-            version: latest
-            contributor: Alice
-            description: python3.5, tensorflow
-            auth:
-              username: user
-              password: <% $secrets.docker_password %>
-              registryuri: openpai.azurecr.io
-            uri: openpai/pai.example.tensorflow
-    ScriptOrOutputComponent:
+    ScriptOrOutputPrerequisite:
       allOf:
-        - $ref: '#/components/schemas/OpenPAIComponent'
+        - $ref: '#/components/schemas/PrerequisiteInfo'
         - type: object
           properties:
             type:
@@ -92,28 +80,9 @@ components:
             - name
             - type
             - uri
-          example:
-            output_example:
-              value:
-                protocolVersion: 2
-                name: tensorflow_cifar10_model
-                type: output
-                version: latest
-                contributor: Alice
-                description: cifar10 data output
-                uri: hdfs://10.151.40.179:9000/core/cifar10_model
-            script_example:
-              value:
-                protocolVersion: 2
-                name: tensorflow_cnnbenchmarks
-                type: script
-                version: 84820935288cab696c9c2ac409cbd46a1f24723d
-                contributor: MaggieQi
-                description: tensorflow benchmarks
-                uri: github.com/MaggieQi/benchmarks
-    DataComponent:
+    DataPrerequisite:
       allOf:
-        - $ref: '#/components/schemas/OpenPAIComponent'
+        - $ref: '#/components/schemas/PrerequisiteInfo'
         - type: object
           properties:
             type:
@@ -129,18 +98,9 @@ components:
           required:
             - type
             - uri
-          example:
-            protocolVersion: 2
-            name: cifar10
-            type: data
-            version: latest
-            contributor: Alice
-            description: cifar10 dataset, image classification
-            uri:
-              - https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
     JobProtocol:
       allOf:
-        - $ref: '#/components/schemas/OpenPAIComponent'
+        - $ref: '#/components/schemas/PrerequisiteInfo'
         - type: object
           description: Job protocol specification.
           properties:
@@ -155,10 +115,44 @@ components:
               description: Each item is the protocol for data, script, dockerimage, or output type.
               items:
                 oneOf:
-                  - $ref: '#/components/schemas/DockerImageComponent'
-                  - $ref: '#/components/schemas/ScriptOrOutputComponent'
-                  - $ref: '#/components/schemas/DataComponent'
+                  - $ref: '#/components/schemas/DockerImagePrerequisite'
+                  - $ref: '#/components/schemas/ScriptOrOutputPrerequisite'
+                  - $ref: '#/components/schemas/DataPrerequisite'
               minItems: 1
+              example:
+                - protocolVersion: 2
+                  name: tf_example
+                  type: dockerimage
+                  version: latest
+                  contributor: Alice
+                  description: python3.5, tensorflow
+                  auth:
+                    username: user
+                    password: <% $secrets.docker_password %>
+                    registryuri: openpai.azurecr.io
+                  uri: openpai/pai.example.tensorflow
+                - protocolVersion: 2
+                  name: tensorflow_cifar10_model
+                  type: output
+                  version: latest
+                  contributor: Alice
+                  description: cifar10 data output
+                  uri: hdfs://10.151.40.179:9000/core/cifar10_model
+                - protocolVersion: 2
+                  name: tensorflow_cnnbenchmarks
+                  type: script
+                  version: 84820935288cab696c9c2ac409cbd46a1f24723d
+                  contributor: MaggieQi
+                  description: tensorflow benchmarks
+                  uri: github.com/MaggieQi/benchmarks
+                - protocolVersion: 2
+                  name: cifar10
+                  type: data
+                  version: latest
+                  contributor: Alice
+                  description: cifar10 dataset, image classification
+                  uri:
+                    - https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz
             parameters:
               type: object
               description: |
