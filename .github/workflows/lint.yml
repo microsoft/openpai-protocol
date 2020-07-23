@@ -9,6 +9,15 @@ on:
     - master
 
 jobs:
+  oas:
+    name: OpenAPI spec lint
+    runs-on: ubuntu-16.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v1
+    - name: Spectral lint
+      run: |
+        npx @stoplight/spectral lint ./schemas/**/schema.{json,yml,yaml}
   spelling:
     name: Spelling check
     runs-on: ubuntu-16.04
