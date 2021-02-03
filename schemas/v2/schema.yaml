@@ -78,12 +78,20 @@ components:
               enum:
                 - script
                 - output
+            plugin:
+              type: string
+              description: It indicates which plugin will be used to parse this prerequisite.
+            require:
+              type: array
+              description: It indicates the required prerequisites to be imported to use this prerequisite.
+              items:
+                type: string
             uri:
               type: string
+          additionalProperties: true
           required:
             - name
             - type
-            - uri
     DataPrerequisite:
       allOf:
         - $ref: "#/components/schemas/PrerequisiteInfo"
@@ -94,14 +102,22 @@ components:
               description: Component type.
               enum:
                 - data
+            plugin:
+              type: string
+              description: It indicates which plugin will be used to parse this prerequisite.
+            require:
+              type: array
+              description: It indicates the required prerequisites to be imported to use this prerequisite.
+              items:
+                type: string
             uri:
               type: array
               items:
                 type: string
               minItems: 1
+          additionalProperties: true
           required:
             - type
-            - uri
     JobProtocol:
       allOf:
         - $ref: "#/components/schemas/PrerequisiteInfo"
@@ -221,6 +237,11 @@ components:
                     type: integer
                     description: Default is 0.
                     minimum: 0
+                  prerequisites:
+                    type: array
+                    description: The prerequisites to run this taskrole. These prerequisites will be used in order.
+                    items:
+                      type: string
                   dockerImage:
                     type: string
                     description: Should reference to a dockerimage defined in prerequisites.
