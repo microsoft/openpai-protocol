@@ -458,7 +458,6 @@ components:
                             type: string
                           affinityGroupName:
                             type: string
-                  example: null
           required:
             - protocolVersion
             - name
