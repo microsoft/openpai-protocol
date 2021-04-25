@@ -40,7 +40,7 @@ components:
         description:
           type: string
           example: Here is the description.
-    DockerImagePrerequisite:
+    ImagePrerequisite:
       allOf:
         - $ref: "#/components/schemas/PrerequisiteInfo"
         - type: object
@@ -49,10 +49,10 @@ components:
               type: string
               description: Component type.
               enum:
-                - dockerimage
+                - image
             auth:
               type: object
-              description: Only available when the type is dockerimage.
+              description: Only available when the type is image.
               properties:
                 username:
                   type: string
@@ -132,17 +132,17 @@ components:
               example: job
             prerequisites:
               type: array
-              description: Each item is the protocol for data, script, dockerimage, or output type.
+              description: Each item is the protocol for data, script, image, or output type.
               items:
                 oneOf:
-                  - $ref: "#/components/schemas/DockerImagePrerequisite"
+                  - $ref: "#/components/schemas/ImagePrerequisite"
                   - $ref: "#/components/schemas/ScriptOrOutputPrerequisite"
                   - $ref: "#/components/schemas/DataPrerequisite"
               minItems: 1
               example:
                 - protocolVersion: 2
                   name: tf_example
-                  type: dockerimage
+                  type: image
                   version: latest
                   contributor: Alice
                   description: python3.5, tensorflow
@@ -242,9 +242,9 @@ components:
                     description: The prerequisites to run this taskrole. These prerequisites will be used in order.
                     items:
                       type: string
-                  dockerImage:
+                  image:
                     type: string
-                    description: Should reference to a dockerimage defined in prerequisites.
+                    description: Should reference to a image defined in prerequisites.
                   data:
                     type: string
                     description: |
@@ -289,7 +289,7 @@ components:
                     items:
                       type: string
                 required:
-                  - dockerImage
+                  - image
                   - resourcePerInstance
                   - commands
               example:
@@ -299,7 +299,7 @@ components:
                     minFailedInstances: 1
                     minSucceededInstances: 1
                   taskRetryCount: 0
-                  dockerImage: tf_example
+                  image: tf_example
                   data: cifar10
                   output: tensorflow_cifar10_model
                   script: tensorflow_cnnbenchmarks
@@ -332,7 +332,7 @@ components:
                     minFailedInstances: 1
                     minSucceededInstances: -1
                   taskRetryCount: 0
-                  dockerImage: tf_example
+                  image: tf_example
                   data: cifar10
                   output: tensorflow_cifar10_model
                   script: tensorflow_cnnbenchmarks
